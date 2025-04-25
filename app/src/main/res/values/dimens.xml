@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="heart_width_height">24dp</dimen>
+    <dimen name="heart_marginHorizontal">20dp</dimen>
+    <dimen name="button_margin">10dp</dimen>
+    <dimen name="button_width">0dp</dimen>
+    <dimen name="margin_bottom">16dp</dimen>
+    <dimen name="matrix_height">1000dp</dimen>
+    <dimen name="car_width_height">90dp</dimen>
+    <dimen name="text_size">80sp</dimen>
+</resources>
