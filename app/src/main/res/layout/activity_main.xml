@@ -47,20 +47,12 @@
             android:id="@+id/main_IMG_matrix"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:rowCount="4"
+            android:rowCount="5"
             android:columnCount="3"
             android:useDefaultMargins="false"
-            android:alignmentMode="alignMargins"/>
-    </FrameLayout>
+            android:alignmentMode="alignMargins" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/main_IMG_car"
-        android:layout_width="@dimen/car_width_height"
-        android:layout_height="@dimen/car_width_height"
-        app:srcCompat="@drawable/car"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="@dimen/margin_bottom"/>
+    </FrameLayout>
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
