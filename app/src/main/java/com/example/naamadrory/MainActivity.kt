@@ -94,7 +94,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun initCarMatrix() {
         val colsNum = gameManager.getMatrix()[0].size
-        val carRow = gameManager.getMatrix().size // שורה תחתונה אחרי המטריצה
+        val carRow = gameManager.getMatrix().size
 
         main_IMG_carMatrix = Array(colsNum) { col ->
             val img = AppCompatImageView(this)
