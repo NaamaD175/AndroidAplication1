@@ -19,24 +19,29 @@ class GameManager(
     val isGameOver: Boolean
         get() = wrongAnswers >= lifeCount
 
+    //Move right
     fun mRight() {
         if (carCol < colsNum - 1) carCol++
     }
 
+    //Move left
     fun mLeft() {
         if (carCol > 0) carCol--
     }
 
+    //GameOver
     fun gameMove() {
         if (!firstMove) {
             mDown()
             checkIsStop()
         }
         firstMove = false
+        updateCarInMatrix()
     }
 
     fun getMatrix(): Array<IntArray> = theMatrix
 
+    //Check if we crashed
     private fun checkIsStop() {
         if (theMatrix[rowsNum - 1][carCol] == 1) {
             wrongAnswers++
@@ -44,6 +49,7 @@ class GameManager(
         }
     }
 
+    //Move down
     private fun mDown() {
         for (row in rowsNum - 1 downTo 1) {
             for (col in 0 until colsNum) {
@@ -57,5 +63,17 @@ class GameManager(
 
         val randomCol = (0 until colsNum).random()
         theMatrix[0][randomCol] = 1
+    }
+
+    //Update the car position
+    private fun updateCarInMatrix() {
+        for (col in 0 until colsNum) {
+            if (theMatrix[rowsNum - 1][col] == 2) {
+                theMatrix[rowsNum - 1][col] = 0
+            }
+        }
+        if (theMatrix[rowsNum - 1][carCol] == 0) {
+            theMatrix[rowsNum - 1][carCol] = 2
+        }
     }
 }

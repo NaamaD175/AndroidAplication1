@@ -21,7 +21,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var main_IMG_hearts: Array<AppCompatImageView>
     private lateinit var main_IMG_matrix: GridLayout
     private lateinit var main_IMG_stopsMatrix: Array<Array<AppCompatImageView>>
-    private lateinit var main_IMG_carMatrix: Array<AppCompatImageView>
     private lateinit var gameManager: GameManager
     private val handler: Handler = Handler(Looper.getMainLooper())
 
@@ -30,18 +29,19 @@ class MainActivity : AppCompatActivity() {
             val currentWrong = gameManager.wrongAnswers
             gameManager.gameMove()
             refreshMatrixUI()
-            updateCarMatrix()
             refreshUI()
 
+            // If crashed - vibrate and message
             if (gameManager.wrongAnswers > currentWrong) {
                 SignalManager.getInstance().vibrate()
                 SignalManager.getInstance().toast("Crash! 💥")
             }
 
+            // If gameOver - send a message
             if (gameManager.isGameOver) {
                 changeActivity("Game Over!!")
             } else {
-                handler.postDelayed(this, 600)
+                handler.postDelayed(this, 1000)
             }
         }
     }
@@ -53,22 +53,21 @@ class MainActivity : AppCompatActivity() {
         findViews()
 
         val colsNum = 3
-        val rowsNum = 4
+        val rowsNum = 5
 
         gameManager = GameManager(rowsNum = rowsNum, colsNum = colsNum, lifeCount = 3)
         main_IMG_matrix.removeAllViews()
 
         initMatrix()
-        initCarMatrix()
         initViews()
 
         gameManager.gameMove()
         refreshMatrixUI()
-        updateCarMatrix()
 
-        handler.postDelayed(gameTickRunnable, 600)
+        handler.postDelayed(gameTickRunnable, 1000)
     }
 
+    // Init the matrix
     private fun initMatrix() {
         val rowsNum = gameManager.getMatrix().size
         val colsNum = gameManager.getMatrix()[0].size
@@ -92,34 +91,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun initCarMatrix() {
-        val colsNum = gameManager.getMatrix()[0].size
-        val carRow = gameManager.getMatrix().size
-
-        main_IMG_carMatrix = Array(colsNum) { col ->
-            val img = AppCompatImageView(this)
-            img.layoutParams = GridLayout.LayoutParams().apply {
-                width = 0
-                height = 0
-                columnSpec = GridLayout.spec(col, 1f)
-                rowSpec = GridLayout.spec(carRow, 1f)
-                setMargins(4, 4, 4, 4)
-            }
-            img.scaleType = ImageView.ScaleType.FIT_CENTER
-            img.adjustViewBounds = true
-            img.setImageResource(R.drawable.car)
-            img.visibility = View.INVISIBLE
-            main_IMG_matrix.addView(img)
-            img
-        }
-    }
-
-    private fun updateCarMatrix() {
-        for (i in main_IMG_carMatrix.indices) {
-            main_IMG_carMatrix[i].visibility = if (i == gameManager.carCol) View.VISIBLE else View.INVISIBLE
-        }
-    }
-
+    // Update matrix display - visible or invisible (car/stop/empty)
     private fun refreshMatrixUI() {
         val theMatrix = gameManager.getMatrix()
 
@@ -139,8 +111,8 @@ class MainActivity : AppCompatActivity() {
                         images.setImageResource(R.drawable.car)
                         images.visibility = View.VISIBLE
                     }
-                    3 -> {
-                        images.setImageResource(R.drawable.stop)
+                    3 -> { // Crash - show the car
+                        images.setImageResource(R.drawable.car)
                         images.visibility = View.VISIBLE
                     }
                 }
@@ -148,24 +120,27 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Update hearts
     private fun refreshUI() {
         for (i in main_IMG_hearts.indices) {
             main_IMG_hearts[i].visibility = if (i < 3 - gameManager.wrongAnswers) View.VISIBLE else View.INVISIBLE
         }
     }
 
+    // Sets up the right or left button
     private fun initViews() {
         main_BTN_right.setOnClickListener {
             gameManager.mRight()
-            updateCarMatrix()
+            refreshMatrixUI()
         }
         main_BTN_left.setOnClickListener {
             gameManager.mLeft()
-            updateCarMatrix()
+            refreshMatrixUI()
         }
-        updateCarMatrix()
+        refreshMatrixUI()
     }
 
+    // Move to another screen and send gameOver if necessary
     private fun changeActivity(message: String) {
         val intent = Intent(this, ScoreActivity::class.java)
         intent.putExtra(Constants.BundleKeys.MESSAGE_KEY, message)
@@ -173,6 +148,7 @@ class MainActivity : AppCompatActivity() {
         finish()
     }
 
+    // Connects buttons, matrix grid, and hearts to their XML components
     private fun findViews() {
         main_BTN_right = findViewById(R.id.main_BTN_right)
         main_BTN_left = findViewById(R.id.main_BTN_left)
@@ -184,6 +160,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    // Stops the game loop
     override fun onDestroy() {
         handler.removeCallbacks(gameTickRunnable)
         super.onDestroy()

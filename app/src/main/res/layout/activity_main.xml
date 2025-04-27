@@ -1,66 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_color"
     android:orientation="vertical"
+    android:background="@color/background_color"
     tools:context=".MainActivity">
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="@dimen/button_margin">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/main_BTN_left"
-            android:layout_width="@dimen/button_width"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_weight="0.5"
-            android:layout_marginBottom="@dimen/margin_bottom"
-            app:icon="@drawable/left"/>
-
-
-        <View
-            android:layout_width="120dp"
-            android:layout_height="12dp"/>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/main_BTN_right"
-            android:layout_width="@dimen/button_width"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_weight="0.5"
-            android:layout_marginBottom="@dimen/margin_bottom"
-            app:icon="@drawable/right"/>
-    </androidx.appcompat.widget.LinearLayoutCompat>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/matrix_height">
-
-        <GridLayout
-            android:id="@+id/main_IMG_matrix"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:rowCount="5"
-            android:columnCount="3"
-            android:useDefaultMargins="false"
-            android:alignmentMode="alignMargins" />
-
-    </FrameLayout>
-
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
         android:layout_margin="10dp"
-        android:layout_marginEnd="4dp"
         android:gravity="end"
         android:orientation="horizontal">
 
@@ -81,8 +32,50 @@
             android:id="@+id/main_IMG_heart2"
             android:layout_width="@dimen/heart_width_height"
             android:layout_height="@dimen/heart_width_height"
-            android:visibility="visible"
             app:srcCompat="@drawable/heart" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-</RelativeLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <GridLayout
+            android:id="@+id/main_IMG_matrix"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:rowCount="5"
+            android:columnCount="3"
+            android:useDefaultMargins="false"
+            android:alignmentMode="alignMargins" />
+    </FrameLayout>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/button_margin"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/main_BTN_left"
+            android:layout_width="@dimen/button_width"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:layout_marginBottom="@dimen/margin_bottom"
+            app:icon="@drawable/left" />
+
+        <View
+            android:layout_width="120dp"
+            android:layout_height="12dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/main_BTN_right"
+            android:layout_width="@dimen/button_width"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:layout_marginBottom="@dimen/margin_bottom"
+            app:icon="@drawable/right" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+</LinearLayout>
