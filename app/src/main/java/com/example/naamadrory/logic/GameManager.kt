@@ -29,7 +29,6 @@ class GameManager(
         if (carCol > 0) carCol--
     }
 
-    //GameOver
     fun gameMove() {
         if (!firstMove) {
             mDown()
