@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/background_color"
     tools:context=".MainActivity">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <LinearLayout
+        android:id="@+id/hearts_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:layout_margin="10dp"
         android:gravity="end"
         android:orientation="horizontal">
@@ -33,12 +34,20 @@
             android:layout_width="@dimen/heart_width_height"
             android:layout_height="@dimen/heart_width_height"
             app:srcCompat="@drawable/heart" />
-    </androidx.appcompat.widget.LinearLayoutCompat>
+    </LinearLayout>
 
     <FrameLayout
+        android:id="@+id/board_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_below="@id/hearts_container"
+        android:layout_above="@id/buttons_container"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="false"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_centerInParent="true">
 
         <GridLayout
             android:id="@+id/main_IMG_matrix"
@@ -50,9 +59,11 @@
             android:alignmentMode="alignMargins" />
     </FrameLayout>
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <LinearLayout
+        android:id="@+id/buttons_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_margin="@dimen/button_margin"
         android:gravity="center"
         android:orientation="horizontal">
@@ -76,6 +87,6 @@
             android:layout_weight="0.5"
             android:layout_marginBottom="@dimen/margin_bottom"
             app:icon="@drawable/right" />
-    </androidx.appcompat.widget.LinearLayoutCompat>
+    </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>
