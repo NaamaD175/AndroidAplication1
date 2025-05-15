@@ -7,6 +7,7 @@ import android.os.Looper
 import android.view.View
 import android.widget.GridLayout
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageView
 import com.google.android.material.button.MaterialButton
@@ -21,6 +22,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var main_IMG_hearts: Array<AppCompatImageView>
     private lateinit var main_IMG_matrix: GridLayout
     private lateinit var main_IMG_stopsMatrix: Array<Array<AppCompatImageView>>
+    private lateinit var main_LBL_score: TextView
     private lateinit var gameManager: GameManager
     private val handler: Handler = Handler(Looper.getMainLooper())
 
@@ -28,6 +30,14 @@ class MainActivity : AppCompatActivity() {
         override fun run() {
             val currentWrong = gameManager.wrongAnswers
             gameManager.gameMove()
+
+            main_LBL_score.text = "${gameManager.score} 🪙"
+
+            if (gameManager.collectedCoin) {
+                SignalManager.getInstance().toast("+10 💰")
+                gameManager.collectedCoin = false
+            }
+
             refreshMatrixUI()
             refreshUI()
 
@@ -40,6 +50,7 @@ class MainActivity : AppCompatActivity() {
             // If gameOver - send a message
             if (gameManager.isGameOver) {
                 changeActivity("Game Over!!")
+                gameManager.resetScore()
             } else {
                 handler.postDelayed(this, 1000)
             }
@@ -115,6 +126,10 @@ class MainActivity : AppCompatActivity() {
                         images.setImageResource(R.drawable.car)
                         images.visibility = View.VISIBLE
                     }
+                    4 -> { //coins
+                        images.setImageResource(R.drawable.coin)
+                        images.visibility = View.VISIBLE
+                    }
                 }
             }
         }
@@ -144,6 +159,7 @@ class MainActivity : AppCompatActivity() {
     private fun changeActivity(message: String) {
         val intent = Intent(this, ScoreActivity::class.java)
         intent.putExtra(Constants.BundleKeys.MESSAGE_KEY, message)
+        intent.putExtra("FINAL_SCORE", gameManager.score)
         startActivity(intent)
         finish()
     }
@@ -152,6 +168,7 @@ class MainActivity : AppCompatActivity() {
     private fun findViews() {
         main_BTN_right = findViewById(R.id.main_BTN_right)
         main_BTN_left = findViewById(R.id.main_BTN_left)
+        main_LBL_score = findViewById(R.id.main_LBL_score)
         main_IMG_matrix = findViewById(R.id.main_IMG_matrix)
         main_IMG_hearts = arrayOf(
             findViewById(R.id.main_IMG_heart0),

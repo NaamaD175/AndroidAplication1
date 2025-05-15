@@ -16,6 +16,12 @@ class GameManager(
     var wrongAnswers: Int = 0
         private set
 
+    var score: Int = 0
+        private set
+
+    //If we take coin
+    var collectedCoin: Boolean = false
+
     val isGameOver: Boolean
         get() = wrongAnswers >= lifeCount
 
@@ -40,11 +46,18 @@ class GameManager(
 
     fun getMatrix(): Array<IntArray> = theMatrix
 
-    //Check if we crashed
+    //Check if we crashed or need to update coins
     private fun checkIsStop() {
-        if (theMatrix[rowsNum - 1][carCol] == 1) {
-            wrongAnswers++
-            theMatrix[rowsNum - 1][carCol] = 3
+        when (theMatrix[rowsNum - 1][carCol]) {
+            1 -> { //block
+                wrongAnswers++
+                theMatrix[rowsNum - 1][carCol] = 3
+            }
+            4 -> { //coin
+                score += 10
+                theMatrix[rowsNum - 1][carCol] = 0
+                collectedCoin = true  //
+            }
         }
     }
 
@@ -61,7 +74,8 @@ class GameManager(
         }
 
         val randomCol = (0 until colsNum).random()
-        theMatrix[0][randomCol] = 1
+        val objectType = if ((0..1).random() == 0) 1 else 4
+        theMatrix[0][randomCol] = objectType
     }
 
     //Update the car position
@@ -74,5 +88,10 @@ class GameManager(
         if (theMatrix[rowsNum - 1][carCol] == 0) {
             theMatrix[rowsNum - 1][carCol] = 2
         }
+    }
+
+    //Reset the score - finish game or GameOver
+    fun resetScore(){
+        score = 0
     }
 }
