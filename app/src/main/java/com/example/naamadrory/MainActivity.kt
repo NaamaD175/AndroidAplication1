@@ -14,12 +14,10 @@ import androidx.appcompat.widget.AppCompatImageView
 import com.google.android.material.button.MaterialButton
 import com.example.naamadrory.logic.GameManager
 import com.example.naamadrory.utilities.Constants
-import com.example.naamadrory.utilities.ImageLoader
 import com.example.naamadrory.utilities.SignalManager
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var sensors_IMG_background: AppCompatImageView
     private lateinit var main_BTN_left: MaterialButton
     private lateinit var main_BTN_right: MaterialButton
     private lateinit var main_IMG_hearts: Array<AppCompatImageView>
@@ -148,13 +146,6 @@ class MainActivity : AppCompatActivity() {
 
     // Sets up the right or left button
     private fun initViews() {
-        ImageLoader
-            .getInstance()
-            .loadImage(
-                "https://www.goarad.co.il/wp-content/uploads/2019/07/65770747_10157323916549322_7067992581107351552_n.jpg" ,
-                sensors_IMG_background
-            )
-
         main_BTN_right.setOnClickListener {
             gameManager.mRight()
             refreshMatrixUI()
@@ -177,7 +168,6 @@ class MainActivity : AppCompatActivity() {
 
     // Connects buttons, matrix grid, and hearts to their XML components
     private fun findViews() {
-        sensors_IMG_background = findViewById(R.id.sensors_IMG_background)
         main_BTN_right = findViewById(R.id.main_BTN_right)
         main_BTN_left = findViewById(R.id.main_BTN_left)
         main_LBL_score = findViewById(R.id.main_LBL_score)
