@@ -1,12 +1,14 @@
 package com.example.naamadrory.logic
 
 class GameManager(
-    private val rowsNum: Int = 4,
-    private val colsNum: Int = 3,
+    private val rowsNum: Int = 6,
+    private val colsNum: Int = 5,
     private val lifeCount: Int = 3,
 ) {
 
     private val theMatrix = Array(rowsNum) { IntArray(colsNum) { 0 } }
+
+    var userMoved: Boolean = false
 
     private var firstMove = true
 
@@ -37,12 +39,16 @@ class GameManager(
 
     fun gameMove() {
         if (!firstMove) {
-            mDown()
+            if (!userMoved) {
+                mDown()
+            }
             checkIsStop()
         }
         firstMove = false
         updateCarInMatrix()
+        userMoved = false
     }
+
 
     fun getMatrix(): Array<IntArray> = theMatrix
 

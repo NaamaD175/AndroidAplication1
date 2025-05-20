@@ -7,6 +7,13 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/main_IMG_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/background" />
+
     <TextView
         android:id="@+id/main_LBL_score"
         android:layout_width="wrap_content"
@@ -67,8 +74,8 @@
             android:id="@+id/main_IMG_matrix"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:rowCount="5"
-            android:columnCount="3"
+            android:rowCount="6"
+            android:columnCount="5"
             android:useDefaultMargins="false"
             android:alignmentMode="alignMargins" />
     </FrameLayout>
@@ -102,5 +109,27 @@
             android:layout_marginBottom="@dimen/margin_bottom"
             app:icon="@drawable/right" />
     </LinearLayout>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/sensors_LBL_tiltX"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size"
+            android:textStyle="bold"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/sensors_LBL_tiltY"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size"
+            android:textStyle="bold"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
 </RelativeLayout>

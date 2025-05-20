@@ -11,10 +11,16 @@ import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageView
+import com.example.naamadrory.interfaces.TiltCallback
 import com.google.android.material.button.MaterialButton
 import com.example.naamadrory.logic.GameManager
+import com.example.naamadrory.utilities.BackgroundMusicPlayer
 import com.example.naamadrory.utilities.Constants
 import com.example.naamadrory.utilities.SignalManager
+import com.example.naamadrory.utilities.SingleSoundPlayer
+import com.example.naamadrory.utilities.TiltDetector
+import com.google.android.material.textview.MaterialTextView
+import kotlin.toString
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,7 +30,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var main_IMG_matrix: GridLayout
     private lateinit var main_IMG_stopsMatrix: Array<Array<AppCompatImageView>>
     private lateinit var main_LBL_score: TextView
+    private lateinit var sensors_LBL_tiltX: MaterialTextView
+    private lateinit var sensors_LBL_tiltY: MaterialTextView
+    private lateinit var tiltDetector: TiltDetector
     private lateinit var gameManager: GameManager
+    private var useSensor: Boolean = false
     private val handler: Handler = Handler(Looper.getMainLooper())
 
     private val gameTickRunnable = object : Runnable {
@@ -46,6 +56,7 @@ class MainActivity : AppCompatActivity() {
             if (gameManager.wrongAnswers > currentWrong) {
                 SignalManager.getInstance().vibrate()
                 SignalManager.getInstance().toast("Crash! 💥")
+                SingleSoundPlayer(this@MainActivity).playSound(R.raw.boom)
             }
 
             // If gameOver - send a message
@@ -65,8 +76,20 @@ class MainActivity : AppCompatActivity() {
 
         findViews()
 
-        val colsNum = 3
-        val rowsNum = 5
+        useSensor = intent.getBooleanExtra(Constants.BundleKeys.USE_SENSOR_KEY, false)
+
+        if (useSensor) {
+            initTiltDetector()
+            main_BTN_left.visibility = View.GONE
+            main_BTN_right.visibility = View.GONE
+        } else {
+            sensors_LBL_tiltX.visibility = View.GONE
+            sensors_LBL_tiltY.visibility = View.GONE
+        }
+
+
+        val colsNum = 5
+        val rowsNum = 6
 
         gameManager = GameManager(rowsNum = rowsNum, colsNum = colsNum, lifeCount = 3)
         main_IMG_matrix.removeAllViews()
@@ -148,12 +171,21 @@ class MainActivity : AppCompatActivity() {
     private fun initViews() {
         main_BTN_right.setOnClickListener {
             gameManager.mRight()
+            gameManager.userMoved = true
+            gameManager.gameMove()
             refreshMatrixUI()
+            refreshUI()
         }
+
         main_BTN_left.setOnClickListener {
             gameManager.mLeft()
+            gameManager.userMoved = true
+            gameManager.gameMove()
             refreshMatrixUI()
+            refreshUI()
         }
+
+
         refreshMatrixUI()
     }
 
@@ -166,11 +198,41 @@ class MainActivity : AppCompatActivity() {
         finish()
     }
 
+    private fun initTiltDetector() {
+        tiltDetector = TiltDetector(
+            context = this,
+            tiltCallback = object : TiltCallback {
+                override fun tiltX() {
+                    val x = tiltDetector.lastX
+                    if (x > 3.0) {
+                        gameManager.mRight()
+                    } else if (x < -3.0) {
+                        gameManager.mLeft()
+                    }
+                    refreshMatrixUI()
+                }
+
+                override fun tiltY() {
+                    val y = tiltDetector.lastY
+                    if (y > 3.0) {
+                        gameManager.mRight()
+                    } else if (y < -3.0) {
+                        gameManager.mLeft()
+                    }
+                    refreshMatrixUI()
+                }
+            }
+        )
+    }
+
+
     // Connects buttons, matrix grid, and hearts to their XML components
     private fun findViews() {
         main_BTN_right = findViewById(R.id.main_BTN_right)
         main_BTN_left = findViewById(R.id.main_BTN_left)
         main_LBL_score = findViewById(R.id.main_LBL_score)
+        sensors_LBL_tiltX = findViewById(R.id.sensors_LBL_tiltX)
+        sensors_LBL_tiltY = findViewById(R.id.sensors_LBL_tiltY)
         main_IMG_matrix = findViewById(R.id.main_IMG_matrix)
         main_IMG_hearts = arrayOf(
             findViewById(R.id.main_IMG_heart0),
@@ -183,5 +245,24 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         handler.removeCallbacks(gameTickRunnable)
         super.onDestroy()
+        BackgroundMusicPlayer.getInstance().stopMusic()
     }
+
+    override fun onResume() {
+        super.onResume()
+        if (useSensor) {
+            tiltDetector.start()
+        }
+        BackgroundMusicPlayer.getInstance().playMusic()
+    }
+
+
+    override fun onPause() {
+        super.onPause()
+        if (useSensor) {
+            tiltDetector.stop()
+        }
+        BackgroundMusicPlayer.getInstance().pauseMusic()
+    }
+
 }
