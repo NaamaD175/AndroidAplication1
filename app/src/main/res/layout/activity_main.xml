@@ -22,10 +22,22 @@
         android:layout_alignParentStart="true"
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
-        android:text="0 🪙"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black" />
+        android:text="Score: 0"
+        android:textSize="18sp"
+        android:textColor="@android:color/white" />
+
+    <TextView
+        android:id="@+id/main_LBL_distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/main_LBL_score"
+        android:layout_alignStart="@id/main_LBL_score"
+        android:layout_marginTop="4dp"
+        android:text="Distance: 0"
+        android:textSize="18sp"
+        android:textColor="@android:color/white" />
+
+
 
 
     <LinearLayout
@@ -95,7 +107,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:layout_marginBottom="@dimen/margin_bottom"
-            app:icon="@drawable/left" />
+            app:icon="@drawable/left"
+            android:contentDescription="Move left"/>
 
         <View
             android:layout_width="120dp"
@@ -107,7 +120,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:layout_marginBottom="@dimen/margin_bottom"
-            app:icon="@drawable/right" />
+            app:icon="@drawable/right"
+            android:contentDescription="Move right"/>
     </LinearLayout>
 
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -131,5 +145,20 @@
             android:textStyle="bold"/>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <TextView
+        android:id="@+id/main_LBL_gameOver"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="26sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:background="#80000000"
+        android:padding="16dp"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:gravity="center"/>
+
 
 </RelativeLayout>

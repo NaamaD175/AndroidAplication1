@@ -27,6 +27,15 @@ class GameManager(
     val isGameOver: Boolean
         get() = wrongAnswers >= lifeCount
 
+    //for the odometer
+    var distance: Int = 0
+        private set
+
+    //for the odometer
+    fun increaseDistanceBy(units: Int) {
+        distance += units
+    }
+
     //Move right
     fun mRight() {
         if (carCol < colsNum - 1) carCol++

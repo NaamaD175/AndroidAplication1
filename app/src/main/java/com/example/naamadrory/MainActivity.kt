@@ -24,6 +24,8 @@ import kotlin.toString
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var main_LBL_gameOver: TextView
+    private lateinit var main_LBL_distance: TextView
     private lateinit var main_BTN_left: MaterialButton
     private lateinit var main_BTN_right: MaterialButton
     private lateinit var main_IMG_hearts: Array<AppCompatImageView>
@@ -34,6 +36,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sensors_LBL_tiltY: MaterialTextView
     private lateinit var tiltDetector: TiltDetector
     private lateinit var gameManager: GameManager
+    private var isFast: Boolean = false
     private var useSensor: Boolean = false
     private val handler: Handler = Handler(Looper.getMainLooper())
 
@@ -42,10 +45,17 @@ class MainActivity : AppCompatActivity() {
             val currentWrong = gameManager.wrongAnswers
             gameManager.gameMove()
 
-            main_LBL_score.text = "${gameManager.score} 🪙"
+            if (isFast) {
+                gameManager.increaseDistanceBy(2)
+            } else {
+                gameManager.increaseDistanceBy(1)
+            }
+
+            main_LBL_score.text = "Score: ${gameManager.score}"
+            main_LBL_distance.text = "Distance: ${gameManager.distance}"
 
             if (gameManager.collectedCoin) {
-                SignalManager.getInstance().toast("+10 💰")
+                SignalManager.getInstance().toast("+10")
                 gameManager.collectedCoin = false
             }
 
@@ -62,9 +72,9 @@ class MainActivity : AppCompatActivity() {
             // If gameOver - send a message
             if (gameManager.isGameOver) {
                 changeActivity("Game Over!!")
-                gameManager.resetScore()
             } else {
-                handler.postDelayed(this, 1000)
+                val delayMillis = if (isFast) 500L else 1000L
+                handler.postDelayed(this, delayMillis)
             }
         }
     }
@@ -76,13 +86,15 @@ class MainActivity : AppCompatActivity() {
 
         findViews()
 
+        isFast = intent.getBooleanExtra(Constants.BundleKeys.IS_FAST_KEY, false)
         useSensor = intent.getBooleanExtra(Constants.BundleKeys.USE_SENSOR_KEY, false)
 
         if (useSensor) {
-            initTiltDetector()
+            startSensorControl()
             main_BTN_left.visibility = View.GONE
             main_BTN_right.visibility = View.GONE
         } else {
+            startButtonControl()
             sensors_LBL_tiltX.visibility = View.GONE
             sensors_LBL_tiltY.visibility = View.GONE
         }
@@ -95,12 +107,50 @@ class MainActivity : AppCompatActivity() {
         main_IMG_matrix.removeAllViews()
 
         initMatrix()
-        initViews()
-
-        gameManager.gameMove()
         refreshMatrixUI()
 
-        handler.postDelayed(gameTickRunnable, 1000)
+        val delayMillis = if (isFast) 500L else 1000L
+        handler.postDelayed(gameTickRunnable, delayMillis)
+    }
+
+    //Sensor Mode
+    private fun startSensorControl()
+    {
+        tiltDetector = TiltDetector(this, object : TiltCallback {
+            override fun tiltX(x: Float) {
+                if (x > 2) {
+                    gameManager.mLeft()
+                } else if (x < -2) {
+                    gameManager.mRight()
+                }
+                refreshMatrixUI()
+            }
+
+            override fun tiltY(y: Float) {
+                isFast = y < -3
+            }
+        })
+        tiltDetector.start()
+    }
+
+    //Button mode
+    private fun startButtonControl()
+    {
+        main_BTN_right.setOnClickListener {
+            gameManager.mRight()
+            gameManager.userMoved = true
+            gameManager.gameMove()
+            refreshMatrixUI()
+            refreshUI()
+        }
+
+        main_BTN_left.setOnClickListener {
+            gameManager.mLeft()
+            gameManager.userMoved = true
+            gameManager.gameMove()
+            refreshMatrixUI()
+            refreshUI()
+        }
     }
 
     // Init the matrix
@@ -151,8 +201,8 @@ class MainActivity : AppCompatActivity() {
                         images.setImageResource(R.drawable.car)
                         images.visibility = View.VISIBLE
                     }
-                    4 -> { //coins
-                        images.setImageResource(R.drawable.coin)
+                    4 -> { //fuel
+                        images.setImageResource(R.drawable.fuel)
                         images.visibility = View.VISIBLE
                     }
                 }
@@ -167,69 +217,35 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Sets up the right or left button
-    private fun initViews() {
-        main_BTN_right.setOnClickListener {
-            gameManager.mRight()
-            gameManager.userMoved = true
-            gameManager.gameMove()
-            refreshMatrixUI()
-            refreshUI()
-        }
-
-        main_BTN_left.setOnClickListener {
-            gameManager.mLeft()
-            gameManager.userMoved = true
-            gameManager.gameMove()
-            refreshMatrixUI()
-            refreshUI()
-        }
-
-
-        refreshMatrixUI()
-    }
-
     // Move to another screen and send gameOver if necessary
     private fun changeActivity(message: String) {
-        val intent = Intent(this, ScoreActivity::class.java)
-        intent.putExtra(Constants.BundleKeys.MESSAGE_KEY, message)
-        intent.putExtra("FINAL_SCORE", gameManager.score)
-        startActivity(intent)
-        finish()
+        val gameOverMessage = "$message\n\nScore: ${gameManager.score}\nDistance: ${gameManager.distance}m"
+        main_LBL_gameOver.text = gameOverMessage
+        main_LBL_gameOver.visibility = View.VISIBLE
+
+        handler.removeCallbacks(gameTickRunnable)
+
+        main_BTN_left.visibility = View.GONE
+        main_BTN_right.visibility = View.GONE
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            val intent = Intent(this, ScoreActivity::class.java)
+            intent.putExtra("EXTRA_SCORE", gameManager.score)
+            intent.putExtra("EXTRA_DISTANCE", gameManager.distance)
+            startActivity(intent)
+            finish()
+            gameManager.resetScore()
+        }, 1500)
     }
 
-    private fun initTiltDetector() {
-        tiltDetector = TiltDetector(
-            context = this,
-            tiltCallback = object : TiltCallback {
-                override fun tiltX() {
-                    val x = tiltDetector.lastX
-                    if (x > 3.0) {
-                        gameManager.mRight()
-                    } else if (x < -3.0) {
-                        gameManager.mLeft()
-                    }
-                    refreshMatrixUI()
-                }
-
-                override fun tiltY() {
-                    val y = tiltDetector.lastY
-                    if (y > 3.0) {
-                        gameManager.mRight()
-                    } else if (y < -3.0) {
-                        gameManager.mLeft()
-                    }
-                    refreshMatrixUI()
-                }
-            }
-        )
-    }
 
 
     // Connects buttons, matrix grid, and hearts to their XML components
     private fun findViews() {
         main_BTN_right = findViewById(R.id.main_BTN_right)
         main_BTN_left = findViewById(R.id.main_BTN_left)
+        main_LBL_distance = findViewById(R.id.main_LBL_distance)
+        main_LBL_gameOver = findViewById(R.id.main_LBL_gameOver)
         main_LBL_score = findViewById(R.id.main_LBL_score)
         sensors_LBL_tiltX = findViewById(R.id.sensors_LBL_tiltX)
         sensors_LBL_tiltY = findViewById(R.id.sensors_LBL_tiltY)
@@ -240,6 +256,8 @@ class MainActivity : AppCompatActivity() {
             findViewById(R.id.main_IMG_heart2)
         )
     }
+
+
 
     // Stops the game loop
     override fun onDestroy() {
