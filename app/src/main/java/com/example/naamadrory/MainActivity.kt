@@ -127,7 +127,11 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun tiltY(y: Float) {
-                isFast = y < -3
+                isFast = when {
+                    y < -3 -> true
+                    y > 3 -> false
+                    else -> false
+                }
             }
         })
         tiltDetector.start()
